@@ -10,46 +10,49 @@ const ItemDetail = () => {
     const { id } = useParams()
     const navigate = useNavigate()
     const { session } = useUserStore()
+    const items = useItemStore((state) => state.items)
     const getItems = useItemStore((state) => state.getItems)
-    const [item, setItem] = useState(undefined)
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState("")
     const [bids, setBids] = useState([])
-
-    const load = async () => {
-        setIsLoading(true)
-        try {
-            setItem((await api.getItems(id)).data)
-        } catch (err) {
-            console.error(error)
-            setError(error.message || "Что-то пошло не так")
-        } finally {
-            setIsLoading(false)
-        }
-    }
+    const [timerId, setTimerId] = useState(undefined)
 
     const loadBids = async () => {
         setIsLoading(true)
         try {
-            setBids((await api.getItemBids(id)).data)
-        } catch (err) {
-            console.error(err)
+            setBids(await api.getItemBids(id))
+        } catch (error) {
             setError(error.message || "Что-то пошло не так")
+            console.error(error)
         } finally {
             setIsLoading(false)
         }
     }
 
     useEffect(() => {
+        const load = async () => {
+            setIsLoading(true)
+            try {
+                await getItems()
+                await loadBids()
+            } catch (error) {
+                setError(error.message || "Что-то пошло не так")
+                console.error(error)
+            } finally {
+                setIsLoading(false)
+            }
+        }
         load()
         loadBids()
 
-        const timer = setInterval(() => {
-            load()
-            loadBids()
-        }, 10000)
-
-        return () => clearInterval(timer)
+        setTimerId(setInterval(() => {
+            try {
+                getItems()
+            } catch (error) { }
+        }, 10000))
+        return () => {
+            clearInterval(timerId)
+        }
     }, [id])
 
     const handleBid = async (e) => {
@@ -60,12 +63,13 @@ const ItemDetail = () => {
         const amount = Number(form.bidInput.value)
 
         try {
-            await api.createBid({ id, amount })
+            await api.createBid({id, amount})
             form.reset()
-            await load()
+            await getItems()
             await loadBids()
-        } catch (err) {
-            setError(err?.message ?? String(err))
+        } catch (error) {
+            setError(error.message|| "Что-то пошло не так")
+            console.error(error)
         }
     }
 
@@ -75,24 +79,23 @@ const ItemDetail = () => {
             await api.deleteItems(id)
             await getItems()
             navigate("/")
-        } catch (err) {
+        } catch (error) {
+            setError(error.message|| "Что-то пошло не так")
             console.error(error)
-            setError(error.message || "Что-то пошло не так")
         }
     }
+
+    const item = items.find((i) => String(i.id) === id)
 
     if (!item) return <div className="container">Загрузка...</div>
 
     const isOwner = session?.user?.id === item.userId
-    
+
     return (
         <div className="container">
             <Link to={"/"}>← Вернуться к списку товаров</Link>
 
             <div className="item-detail">
-                {!isLoading && error && (
-                    <div className="alert alert-error active">{error}</div>)}
-
                 <div className="item-header">
                     <div>
                         {item.imageUrl && (
@@ -140,8 +143,14 @@ const ItemDetail = () => {
                                 </Button>
                             </form>
 
+                            {!isLoading && error && (
+                                <div className="alert alert-error active">{error}</div>
+                            )}
+
                             {isOwner && (
-                                <Button type="button" onClick={handleDelete}>Удалить товар</Button>
+                                <Button type="button" onClick={handleDelete}>
+                                    Удалить товар
+                                </Button>
                             )}
                         </div>
                     </div>

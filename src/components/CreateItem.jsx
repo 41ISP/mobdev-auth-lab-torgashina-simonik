@@ -19,8 +19,9 @@ const CreateItem = () => {
             imageUrl: e.target.imageUrl.value
         }
         try {
-            const data = await api.sendItems(item)
-            navigate(`/item/${data.data.id}`)
+            await api.sendItems(item)
+            await getItems()
+            navigate("/")
         } catch (error) {
             console.error(error)
         }

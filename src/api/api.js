@@ -19,6 +19,8 @@ apiInstance.interceptors.request.use((config) => {
     return config
 })
 
+export const getErrorMessage = (err) =>
+    err?.response?.data?.error || err?.message || "Что-то пошло не так"
 
 const registerUser = async(user) => {
     const res = await apiInstance.post("/auth/register", user)
@@ -32,36 +34,36 @@ const loginUser = async(user) => {
 
 const getItems = async() => {
     const res = await apiInstance.get("/items")
-    return res
+    return res.data
 }
 
 const getStats = async() => {
     const res = await apiInstance.get("/stats")
-    return res
+    return res.data
 }
 
 const getItemBids = async(id) => {
     const res = await apiInstance.get(`/items/${id}/bids`)
-    return res
+    return res.data
 }
 
 const getMyBids = async() => {
     const res = await apiInstance.get("/bids/my")
-    return res
+    return res.data
 }
 
 const sendItems = async(item) => {
     const res = await apiInstance.post("/items", item)
-    return res
+    return res.data
 }
 
 const deleteItems = async(id) => {
     const res = await apiInstance.delete(`/items/${id}`)
-    return res
+    return res.data
 }
 const createBid = async({id, amount}) => {
     const res = await apiInstance.post(`/items/${id}/bids`, { amount })
-    return res
+    return res.data
 }
 
 

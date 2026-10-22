@@ -8,7 +8,7 @@ const MyBids = () => {
     useEffect(() => {
         const loadBids = async () => {
             try {
-                setBids((await api.getMyBids()).data)
+                setBids(await api.getMyBids())
             } catch (error) {
                 console.error(error)
             }

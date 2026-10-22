@@ -6,8 +6,8 @@ const Logout = () => {
     const navigate = useNavigate()
     const {clearSession} = useUserStore()
     useEffect(() => {
-        navigate('/')
         clearSession()
+        navigate('/')
     }, [])
     return <></>
 }

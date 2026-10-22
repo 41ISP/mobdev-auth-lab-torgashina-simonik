@@ -14,7 +14,7 @@ const ItemsList = () => {
         const loadStats = async () => {
             try {
                 const data = await api.getStats()
-                setStats(data.data)
+                setStats(data)
             } catch (error) {
                 console.error(error)
             }
@@ -28,19 +28,19 @@ const ItemsList = () => {
             </div>
             <div class="stats">
                 <div class="stat-item">
-                    <span class="stat-value">{stats?.totalItems}</span>
+                    <span class="stat-value">{stats?.totalItems ?? 0}</span>
                     <span class="stat-label">Товаров</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-value">{stats?.totalBids}</span>
+                    <span class="stat-value">{stats?.totalBids ?? 0}</span>
                     <span class="stat-label">Ставок</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-value">{stats?.activeItems}</span>
+                    <span class="stat-value">{stats?.activeItems ?? 0}</span>
                     <span class="stat-label">Активных</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-value">{stats?.averageItemPrice}</span>
+                    <span class="stat-value">{stats?.averageItemPrice ?? 0}</span>
                     <span class="stat-label">Средняя цена</span>
                 </div>
             </div>

@@ -5,9 +5,9 @@ export const useItemStore = create((set) => ({
     items: [],
     getItems: async() => {
         try {
-            const res = await api.getItems()
-            set({items: res.data})
-        } catch {
+            const items = await api.getItems()
+            set({ items })
+        } catch(error) {
             console.error(error)
         }
     }
